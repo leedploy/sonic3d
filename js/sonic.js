@@ -16,15 +16,15 @@ class SonicPlayer {
         this.bankingAngle = 0;
         this.worldGroundHeight = 0;
         
-        // Physics constants - Balanced Responsive Sonic Velocity Tuning
-        this.accel = 36.0;
-        this.maxSpeed = 34.0;
-        this.boostMaxSpeed = 50.0;
-        this.friction = 0.93;
-        this.gravity = 55.0;
-        this.jumpForce = 31.0;
-        this.minJumpForce = 13.0;
-        this.springForce = 48.0;
+        // Physics constants - Sonic Momentum Engine Specs (1ThaiAi Master Prompt)
+        this.accel = 42.0;
+        this.maxSpeed = 48.0;
+        this.boostMaxSpeed = 82.0;
+        this.friction = 0.94;
+        this.gravity = 42.0;
+        this.jumpForce = 28.0;
+        this.minJumpForce = 14.0;
+        this.springForce = 52.0;
         
         // States
         this.isGrounded = false;
