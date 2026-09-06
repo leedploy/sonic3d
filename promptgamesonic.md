@@ -13,6 +13,7 @@
 1. **เชื่อมต่อ Cloudflare R2 CDN อัตโนมัติ**: AI จะดึงโมเดล 3D โซนิคตัวจริง (`.fbx`, `.glb`), แอนิเมชันกระดูก, เพลงฉากหลัง 3 ด่าน (`.mp3`), และวิดีโอหน้าแรก จาก CDN ของ 1ThaiAi ทันที ทำให้ได้เกมที่มีภาพและเสียงระดับคอนโซลโดยไม่ต้องดาวน์โหลดไฟล์ลงเครื่อง
 2. **มีสูตรฟิสิกส์เฉพาะทางครบถ้วน**: บรรจุสูตรคำนวณการวิ่งไต่ลูป 360 องศา (Loop-de-Loop), แรงดูดเหรียญแม่เหล็ก (Ring Magnetism), ระบบ Sonic Boost ทะยานความเร็ว, และระบบจำกัดการเสียเหรียญเมื่อชนหนาม (Cap Ring Loss at 20 Rings)
 3. **ระบบสำรอง 100% (Zero-Crash Fallback)**: หากออฟไลน์ AI จะมีระบบสร้างโมเดล 3D แบบ Procedural Mesh และสังเคราะห์เสียงด้วย Web Audio API ให้เล่นได้เสมอ
+4. **Cloud-Native 100% (ไร้โฟลเดอร์ assets ในเครื่อง)**: บังคับ AI ห้ามสร้างโฟลเดอร์ `assets/` ในเครื่อง และห้ามก๊อปปี้ไฟล์ใดๆ มาปน ทำให้โปรเจกต์มีเฉพาะไฟล์โค้ดล้วนๆ ขนาดรวมเบาหวิวไม่ถึง 2 MB สตรีมโมเดลและเสียงผ่าน CDN ทั้งหมด
 
 ---
 
@@ -26,8 +27,14 @@ Your objective is to construct a complete, fully functional, multi-stage 3D Soni
 
 ---
 
+### ⚠️ STRICT ZERO-LOCAL-ASSET DIRECTIVE (CRITICAL MANDATE)
+- **DO NOT create a local `assets/` folder** on disk.
+- **DO NOT download, clone, search, or copy local media files** from any directory on the local machine.
+- This project is **100% Cloud-Native**: all binary 3D models (.fbx, .glb), textures, animations, audio (.mp3), and videos (.mp4) **MUST be streamed directly via HTTP from the official Cloudflare R2 CDN endpoints** specified below.
+- The project workspace must contain **ONLY code files** (`index.html`, `style.css`, `js/*.js`) and keep a featherweight footprint (< 2 MB) with zero binary assets stored locally.
+
 ### 🌐 CLOUD ASSET REGISTRY (CLOUDFLARE R2 CDN)
-Do NOT leave placeholders or fake asset paths. Load all binary models, animations, soundtracks, and media directly from the official 1ThaiAi high-speed CDN:
+Load all binary models, animations, soundtracks, and media directly from the official 1ThaiAi high-speed CDN (No local paths, no placeholders):
 - CDN Base URL: `https://cdn.1thaiai.com/gameprompt/006Sonic3d/`
 
 #### 1. 3D Character Models & Animations (FBX & GLTF):
