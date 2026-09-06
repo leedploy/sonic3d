@@ -18,3 +18,8 @@ assets/
 .DS_Store
 Thumbs.db
 node_modules/
+
+# Prompt & Internal dev blueprint files (local only)
+idea.md
+promptgamesonic.md
+Promptsonic3dtrue.md
