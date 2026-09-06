@@ -1,0 +1,20 @@
+# Heavy media & raw 3D assets (Hosted on Cloudflare R2: https://cdn.1thaiai.com/gameprompt/006Sonic3d/)
+assets/
+
+# 3D Raw & Archive files
+*.obj
+*.mtl
+*.zip
+*.fbx
+
+# Temporary test captures
+*.png
+!js/*.png
+
+# IDE & OS Junk
+.vscode/
+.idea/
+.gemini/
+.DS_Store
+Thumbs.db
+node_modules/

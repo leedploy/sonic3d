@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Sonic 3D HTML5 - Green Hill • Chemical Plant • Hydrocity</title>
+    <link rel="stylesheet" href="style.css?v=7.6">
+    <style>
+        /* Modals & Screens Critical Fixed Overlay Styles */
+        .modal-overlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 10000 !important;
+            background: rgba(3, 8, 24, 0.85) !important;
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+        }
+
+        .modal-overlay.hidden {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        /* Top Right Action Buttons */
+        #top-right-btns {
+            position: fixed !important;
+            top: 20px !important;
+            right: 24px !important;
+            z-index: 500 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            pointer-events: auto !important;
+        }
+
+        .hud-circle-btn {
+            background: rgba(4, 14, 38, 0.85) !important;
+            color: #ffffff !important;
+            border: 2.5px solid #ffd700 !important;
+            border-radius: 50% !important;
+            width: 48px !important;
+            height: 48px !important;
+            font-size: 22px !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.75), 0 0 12px rgba(255, 215, 0, 0.35) !important;
+            user-select: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+            pointer-events: auto !important;
+        }
+
+        .hud-circle-btn:hover {
+            transform: scale(1.12) !important;
+            background: rgba(14, 48, 130, 0.95) !important;
+            border-color: #00f0ff !important;
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.9), 0 0 22px rgba(0, 240, 255, 0.85) !important;
+        }
+
+        .hud-circle-btn:active {
+            transform: scale(0.92) !important;
+        }
+
+        .modal-close-x-btn {
+            position: absolute !important;
+            top: 14px !important;
+            right: 18px !important;
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 50% !important;
+            border: 2px solid rgba(255, 255, 255, 0.6) !important;
+            background: rgba(230, 30, 45, 0.85) !important;
+            color: #ffffff !important;
+            font-size: 16px !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: transform 0.15s ease, background 0.15s ease !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+            z-index: 10 !important;
+        }
+
+        .modal-close-x-btn:hover {
+            transform: scale(1.15) rotate(90deg) !important;
+            background: rgba(255, 45, 60, 1) !important;
+            border-color: #ffffff !important;
+        }
+
+        .modal-close-x-btn:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* Fullscreen Video Background & Center Hero Buttons */
+        #start-screen {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #000000 !important;
+            z-index: 999 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        #start-screen.hidden {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            display: none !important;
+        }
+
+        #start-bg-video {
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            min-width: 100vw !important;
+            min-height: 100vh !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            transform: translate(-50%, -50%) !important;
+            object-fit: cover !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+            filter: brightness(0.9) contrast(1.08);
+        }
+
+        .start-video-overlay {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: radial-gradient(circle at center, rgba(0, 0, 0, 0.15) 0%, rgba(2, 6, 20, 0.72) 100%),
+                        linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.65) 100%) !important;
+            z-index: 1 !important;
+            pointer-events: none !important;
+        }
+
+        .start-center-card {
+            position: relative !important;
+            z-index: 2 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: rgba(4, 12, 34, 0.62) !important;
+            backdrop-filter: blur(18px) !important;
+            -webkit-backdrop-filter: blur(18px) !important;
+            border: 2px solid rgba(0, 240, 255, 0.45) !important;
+            border-radius: 36px !important;
+            padding: 34px 48px !important;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 
+                        0 0 45px rgba(0, 150, 255, 0.35), 
+                        inset 0 0 30px rgba(0, 240, 255, 0.18) !important;
+            animation: cardZoomIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            max-width: 440px !important;
+            width: 90% !important;
+        }
+
+        @keyframes cardZoomIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .start-act-badge {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            margin-bottom: 22px !important;
+            font-family: 'Press Start 2P', monospace, sans-serif !important;
+            font-size: 11px !important;
+            letter-spacing: 2px !important;
+            color: #48c734 !important;
+            text-shadow: 0 0 10px rgba(72, 199, 52, 0.8) !important;
+        }
+
+        .badge-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #48c734;
+            box-shadow: 0 0 10px #48c734;
+        }
+
+        .start-btn-group {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 16px !important;
+            align-items: center !important;
+            width: 100% !important;
+        }
+
+        .hero-start-btn {
+            position: relative !important;
+            overflow: hidden !important;
+            width: 100% !important;
+            max-width: 350px !important;
+            height: 64px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 14px !important;
+            background: linear-gradient(135deg, #ffe066 0%, #ff9d00 48%, #ff3b00 100%) !important;
+            border: 3px solid #ffffff !important;
+            border-radius: 50px !important;
+            cursor: pointer !important;
+            box-shadow: 0 10px 28px rgba(255, 120, 0, 0.65), 
+                        0 0 24px rgba(255, 220, 0, 0.5), 
+                        inset 0 2px 0 rgba(255, 255, 255, 0.8) !important;
+            transition: transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.18s ease !important;
+            animation: heroPulse 1.8s infinite alternate ease-in-out !important;
+        }
+
+        @keyframes heroPulse {
+            0% { transform: scale(1); box-shadow: 0 10px 28px rgba(255, 120, 0, 0.65), 0 0 24px rgba(255, 220, 0, 0.5); }
+            100% { transform: scale(1.03); box-shadow: 0 14px 36px rgba(255, 120, 0, 0.85), 0 0 35px rgba(255, 220, 0, 0.8); }
+        }
+
+        .hero-start-btn:hover {
+            transform: translateY(-3px) scale(1.04) !important;
+            box-shadow: 0 16px 42px rgba(255, 120, 0, 0.9), 0 0 40px rgba(255, 220, 0, 0.9) !important;
+        }
+
+        .hero-start-btn:active {
+            transform: translateY(1px) scale(0.98) !important;
+        }
+
+        .hero-leaderboard-btn {
+            position: relative !important;
+            overflow: hidden !important;
+            width: 100% !important;
+            max-width: 350px !important;
+            height: 64px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 14px !important;
+            background: linear-gradient(135deg, rgba(16, 42, 108, 0.95) 0%, rgba(6, 18, 54, 0.98) 100%) !important;
+            border: 3px solid #ffd700 !important;
+            border-radius: 50px !important;
+            cursor: pointer !important;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8), 
+                        0 0 20px rgba(0, 220, 255, 0.4), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+            transition: transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.18s ease !important;
+        }
+
+        .hero-leaderboard-btn:hover {
+            transform: translateY(-3px) scale(1.04) !important;
+            background: linear-gradient(135deg, rgba(24, 60, 150, 0.98) 0%, rgba(10, 28, 80, 1) 100%) !important;
+            border-color: #ffe855 !important;
+            box-shadow: 0 16px 38px rgba(0, 0, 0, 0.9), 0 0 32px rgba(0, 240, 255, 0.7) !important;
+        }
+
+        .hero-leaderboard-btn:active {
+            transform: translateY(1px) scale(0.98) !important;
+        }
+
+        .hero-settings-btn {
+            position: relative !important;
+            overflow: hidden !important;
+            width: 100% !important;
+            max-width: 350px !important;
+            height: 64px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 14px !important;
+            background: linear-gradient(135deg, rgba(8, 48, 64, 0.95) 0%, rgba(4, 24, 38, 0.98) 100%) !important;
+            border: 3px solid #00f0ff !important;
+            border-radius: 50px !important;
+            cursor: pointer !important;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8), 
+                        0 0 20px rgba(0, 240, 255, 0.4), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+            transition: transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.18s ease !important;
+        }
+
+        .hero-settings-btn:hover {
+            transform: translateY(-3px) scale(1.04) !important;
+            background: linear-gradient(135deg, rgba(12, 70, 95, 0.98) 0%, rgba(6, 36, 56, 1) 100%) !important;
+            border-color: #6effff !important;
+            box-shadow: 0 16px 38px rgba(0, 0, 0, 0.9), 0 0 32px rgba(0, 240, 255, 0.7) !important;
+        }
+
+        .hero-settings-btn:active {
+            transform: translateY(1px) scale(0.98) !important;
+        }
+
+        .hero-settings-btn .btn-icon-wrap {
+            background: rgba(0, 240, 255, 0.18) !important;
+            border: 1.5px solid #00f0ff !important;
+            color: #00f0ff !important;
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.4) !important;
+        }
+
+        .hero-settings-btn .btn-main-text {
+            font-family: 'Press Start 2P', monospace, sans-serif !important;
+            font-size: 13px !important;
+            font-weight: 900 !important;
+            letter-spacing: 2px !important;
+            color: #00f0ff !important;
+            text-shadow: 0 0 12px rgba(0, 240, 255, 0.7) !important;
+        }
+
+        .hero-settings-btn .btn-sub-text {
+            font-family: system-ui, -apple-system, sans-serif !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            letter-spacing: 1px !important;
+            color: #48c734 !important;
+            text-shadow: 0 0 8px rgba(72, 199, 52, 0.6) !important;
+        }
+
+        .btn-icon-wrap {
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 16px !important;
+            flex-shrink: 0 !important;
+        }
+
+        .hero-start-btn .btn-icon-wrap {
+            background: rgba(255, 255, 255, 0.35) !important;
+            color: #1a0800 !important;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .hero-leaderboard-btn .btn-icon-wrap {
+            background: rgba(255, 215, 0, 0.18) !important;
+            border: 1.5px solid #ffd700 !important;
+            color: #ffd700 !important;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.4) !important;
+        }
+
+        .btn-text-wrap {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            text-align: left !important;
+            line-height: 1.2 !important;
+        }
+
+        .hero-start-btn .btn-main-text {
+            font-family: 'Press Start 2P', monospace, sans-serif !important;
+            font-size: 15px !important;
+            font-weight: 900 !important;
+            letter-spacing: 2px !important;
+            color: #1a0800 !important;
+            text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.4) !important;
+        }
+
+        .hero-start-btn .btn-sub-text {
+            font-family: system-ui, -apple-system, sans-serif !important;
+            font-size: 11px !important;
+            font-weight: 800 !important;
+            letter-spacing: 1px !important;
+            color: #551500 !important;
+        }
+
+        .hero-leaderboard-btn .btn-main-text {
+            font-family: 'Press Start 2P', monospace, sans-serif !important;
+            font-size: 13px !important;
+            font-weight: 900 !important;
+            letter-spacing: 2px !important;
+            color: #ffd700 !important;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.7) !important;
+        }
+
+        .hero-leaderboard-btn .btn-sub-text {
+            font-family: system-ui, -apple-system, sans-serif !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            letter-spacing: 1px !important;
+            color: #00f0ff !important;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.6) !important;
+        }
+
+        .btn-shine {
+            position: absolute !important;
+            top: 0 !important;
+            left: -120% !important;
+            width: 60% !important;
+            height: 100% !important;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent) !important;
+            transform: skewX(-25deg) !important;
+            transition: left 0.7s ease !important;
+            pointer-events: none !important;
+        }
+
+        .hero-start-btn:hover .btn-shine,
+        .hero-leaderboard-btn:hover .btn-shine,
+        .hero-settings-btn:hover .btn-shine {
+            left: 160% !important;
+        }
+
+        .start-hint-text {
+            margin-top: 20px !important;
+            font-family: 'Press Start 2P', monospace, sans-serif !important;
+            font-size: 9px !important;
+            color: rgba(255, 255, 255, 0.85) !important;
+            letter-spacing: 1.5px !important;
+            animation: hintBlink 2.2s infinite ease-in-out !important;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.5) !important;
+        }
+
+        @keyframes hintBlink {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Bottom Right 1ThaiAi Credit Link */
+        .start-credit-link {
+            position: absolute !important;
+            bottom: 24px !important;
+            right: 28px !important;
+            z-index: 100 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-end !important;
+            gap: 4px !important;
+            text-decoration: none !important;
+            background: rgba(4, 14, 38, 0.82) !important;
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
+            border: 2px solid rgba(0, 240, 255, 0.55) !important;
+            border-radius: 16px !important;
+            padding: 11px 20px !important;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8), 
+                        0 0 20px rgba(0, 240, 255, 0.3) !important;
+            transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+        }
+
+        .start-credit-link:hover {
+            transform: translateY(-3px) scale(1.04) !important;
+            border-color: #ffd700 !important;
+            background: rgba(8, 22, 58, 0.95) !important;
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.9), 
+                        0 0 28px rgba(255, 215, 0, 0.55) !important;
+        }
+
+        .start-credit-link:active {
+            transform: translateY(1px) scale(0.98) !important;
+        }
+
+        .credit-row-main {
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+        }
+
+        .credit-brand {
+            font-family: 'Press Start 2P', monospace, sans-serif !important;
+            font-size: 11px !important;
+            letter-spacing: 1px !important;
+            color: #00f0ff !important;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.8) !important;
+            transition: color 0.2s ease !important;
+        }
+
+        .start-credit-link:hover .credit-brand {
+            color: #ffd700 !important;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.9) !important;
+        }
+
+        .credit-arrow {
+            font-size: 13px !important;
+            color: #ffd700 !important;
+            transition: transform 0.25s ease !important;
+        }
+
+        .start-credit-link:hover .credit-arrow {
+            transform: translateX(4px) !important;
+            color: #00f0ff !important;
+        }
+
+        .credit-sub {
+            font-family: system-ui, -apple-system, sans-serif !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            color: #ffffff !important;
+            letter-spacing: 0.5px !important;
+            opacity: 0.92 !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
+        }
+
+        @media (max-width: 600px) {
+            .start-credit-link {
+                bottom: 12px !important;
+                right: 12px !important;
+                padding: 8px 14px !important;
+                border-radius: 12px !important;
+            }
+            .credit-brand {
+                font-size: 9px !important;
+            }
+            .credit-sub {
+                font-size: 9px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D Canvas Container -->
+    <div id="game-container"></div>
+
+    <!-- Speed Lines FX Canvas -->
+    <canvas id="speed-lines-canvas"></canvas>
+
+    <!-- Top Retro Sonic HUD -->
+    <div id="hud-overlay">
+        <div class="hud-item">
+            <span class="hud-label">SCORE</span>
+            <span id="hud-score" class="hud-value">000000</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-label">TIME</span>
+            <span id="hud-time" class="hud-value">0:00:00</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-label">RINGS</span>
+            <span id="hud-rings" class="hud-value pulse-zero">0</span>
+        </div>
+        <div class="hud-item hud-lives-item">
+            <span class="hud-label">LIVES</span>
+            <span id="hud-lives" class="hud-value hud-lives-val">🦔 x 3</span>
+        </div>
+    </div>
+
+    <!-- Stage Progress Bar (Top Center) -->
+    <div id="stage-progress-container">
+        <div class="progress-info-row">
+            <span class="progress-tag">COURSE PROGRESS</span>
+            <span id="stage-progress-text" class="progress-percent">0%</span>
+        </div>
+        <div class="stage-track-bar">
+            <div id="stage-progress-fill"></div>
+            <span class="progress-goal-icon" title="Giant Goal Ring">🌟 GOAL</span>
+        </div>
+    </div>
+
+    <!-- Respawn Alert Banner -->
+    <div id="respawn-toast" class="hidden">💥 RESPAWN! KEEP RUNNING!</div>
+
+    <!-- Bottom Boost & Speed HUD -->
+    <div id="bottom-hud">
+        <div class="boost-container">
+            <span class="boost-label">BOOST</span>
+            <div class="boost-bar-track">
+                <div id="boost-fill"></div>
+            </div>
+        </div>
+        <div id="hud-speed" class="speed-meter">0 KM/H</div>
+    </div>
+
+    <!-- 3... 2... 1... GO! Rocket Start Countdown Overlay -->
+    <div id="countdown-overlay" class="countdown-overlay hidden">
+        <div class="countdown-badge">
+            <span class="badge-dot"></span>
+            <span id="countdown-stage-title">GREEN HILL ZONE • ACT 1</span>
+            <span class="badge-dot"></span>
+        </div>
+        <div id="countdown-number" class="countdown-num count-3">3</div>
+        <div id="countdown-hint" class="countdown-hint">
+            <span class="hint-sparkle">⚡</span>
+            <span>HOLD <strong>[S]</strong> + <strong>[SPACE]</strong> OR <strong>[BOOST]</strong> FOR ROCKET START!</span>
+            <span class="hint-sparkle">⚡</span>
+        </div>
+    </div>
+
+    <!-- Top Right Action Buttons -->
+    <div id="top-right-btns">
+        <button id="hud-help-btn" class="hud-circle-btn" onclick="openHelpModal()" title="วิธีเล่น & เมนู (Controls & Menu)" aria-label="Help">🎮</button>
+        <button id="hud-leaderboard-btn" class="hud-circle-btn" onclick="openLeaderboardModal()" title="อันดับคะแนน (Leaderboard)" aria-label="Leaderboard">🏆</button>
+        <button id="hud-settings-btn" class="hud-circle-btn" onclick="openSettingsModal()" title="ตั้งค่าเสียง (Settings)" aria-label="Settings">⚙️</button>
+        <button id="mute-btn" class="hud-circle-btn" title="เปิด/ปิดเสียง" aria-label="Toggle Sound">🔊</button>
+    </div>
+
+    <!-- Touch Controls for Mobile/Tablet -->
+    <div id="touch-controls">
+        <div class="touch-dpad">
+            <button id="touch-up" class="touch-btn" aria-label="Forward">▲</button>
+            <button id="touch-left" class="touch-btn" aria-label="Left">◀</button>
+            <button id="touch-down" class="touch-btn" aria-label="Down / Spin">▼</button>
+            <button id="touch-right" class="touch-btn" aria-label="Right">▶</button>
+        </div>
+        <div class="touch-actions">
+            <button id="touch-boost" class="touch-btn action-btn" aria-label="Boost">BOOST</button>
+            <button id="touch-jump" class="touch-btn action-btn" aria-label="Jump">JUMP</button>
+        </div>
+    </div>
+
+    <!-- Start / Title Screen Overlay with Background Video -->
+    <div id="start-screen" class="start-fullscreen-modal">
+        <video id="start-bg-video" autoplay muted loop playsinline class="start-bg-video">
+            <source src="https://cdn.1thaiai.com/gameprompt/006Sonic3d/sonicvideo.mp4" type="video/mp4">
+            <source src="assets/sonicvideo.mp4" type="video/mp4">
+        </video>
+        <div class="start-video-overlay"></div>
+
+        <div class="start-center-card">
+            <div class="start-act-badge" id="start-act-badge">
+                <span class="badge-dot"></span>
+                <span class="badge-text" id="start-badge-text">GREEN HILL ZONE • ACT 1</span>
+                <span class="badge-dot"></span>
+            </div>
+
+            <div class="start-btn-group">
+                <button id="start-btn" class="hero-start-btn" aria-label="Start Game">
+                    <span class="btn-icon-wrap">▶</span>
+                    <div class="btn-text-wrap">
+                        <span class="btn-main-text">START GAME</span>
+                        <span class="btn-sub-text">เริ่มเล่นเกม</span>
+                    </div>
+                    <span class="btn-shine"></span>
+                </button>
+
+                <button id="start-leaderboard-btn" class="hero-leaderboard-btn" aria-label="Leaderboard">
+                    <span class="btn-icon-wrap">🏆</span>
+                    <div class="btn-text-wrap">
+                        <span class="btn-main-text">LEADERBOARD</span>
+                        <span class="btn-sub-text">อันดับผู้เล่น Top 10</span>
+                    </div>
+                    <span class="btn-shine"></span>
+                </button>
+
+                <button id="start-settings-btn" class="hero-settings-btn" onclick="openSettingsModal()" aria-label="Settings">
+                    <span class="btn-icon-wrap">⚙️</span>
+                    <div class="btn-text-wrap">
+                        <span class="btn-main-text">SETTINGS</span>
+                        <span class="btn-sub-text">ตั้งค่าเสียง BGM / SFX</span>
+                    </div>
+                    <span class="btn-shine"></span>
+                </button>
+            </div>
+
+            <div class="start-hint-text">⚡ PRESS SPACEBAR OR CLICK TO START ⚡</div>
+        </div>
+
+        <!-- Bottom Right Website Credit Link -->
+        <a href="https://1thaiai.com" target="_blank" rel="noopener noreferrer" class="start-credit-link" id="start-credit-link" title="เยี่ยมชม www.1ThaiAi.com - Free Prompt game and website">
+            <div class="credit-row-main">
+                <span class="credit-brand">www.1ThaiAi.com</span>
+                <span class="credit-arrow">➔</span>
+            </div>
+            <span class="credit-sub">Free Prompt game and website</span>
+        </a>
+    </div>
+
+    <!-- In-Game Controls & Menu Modal Screen -->
+    <div id="help-modal" class="modal-overlay hidden">
+        <div class="instructions-card help-card">
+            <button id="help-close-x-btn" class="modal-close-x-btn" onclick="closeHelpModal()" title="ปิดหน้าต่าง (Close)">✖</button>
+            <div class="instructions-header">
+                <div class="instructions-title">🕹️ CONTROLS & HOW TO PLAY (วิธีเล่น)</div>
+                <div class="instructions-subtitle">GREEN HILL ZONE GUIDE</div>
+            </div>
+            <div class="key-list">
+                <div class="key-row">
+                    <span>วิ่ง / บังคับทิศทาง</span>
+                    <span class="key-badge">W, A, S, D / Arrow Keys</span>
+                </div>
+                <div class="key-row">
+                    <span>กระโดด (แตะปล่อย=เตี้ย / กดค้าง=สูง)</span>
+                    <span class="key-badge">SPACEBAR</span>
+                </div>
+                <div class="key-row">
+                    <span>Sonic Boost (เร่งความเร็วพุ่งทะยาน)</span>
+                    <span class="key-badge">SHIFT / E</span>
+                </div>
+                <div class="key-row">
+                    <span>Spin Dash (ชาร์จปั่นล้อพุ่งกระสุน)</span>
+                    <span class="key-badge">Hold S + Tap SPACEBAR</span>
+                </div>
+                <div class="key-row">
+                    <span>หมุนกล้อง 360° รอบตัว / ซูม</span>
+                    <span class="key-badge">Mouse Drag / Scroll [R: Reset]</span>
+                </div>
+                <div class="key-row">
+                    <span>เปิด/ปิดเสียง</span>
+                    <span class="key-badge">M</span>
+                </div>
+            </div>
+
+            <div class="help-btn-group">
+                <button id="resume-game-btn" class="start-button resume-btn" onclick="closeHelpModal()">▶ RESUME (เล่นต่อ)</button>
+                <button id="help-settings-btn" class="hero-settings-btn" onclick="closeHelpModal(); openSettingsModal();" style="max-width: 280px; height: 46px;">⚙️ AUDIO SETTINGS</button>
+                <button id="quit-to-title-btn" class="quit-title-btn" onclick="if(window.game)window.game.quitToTitleScreen()">🏠 QUIT TO TITLE (กลับหน้าแรก)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Settings Modal Screen -->
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="instructions-card settings-card">
+            <button id="settings-close-x-btn" class="modal-close-x-btn" onclick="closeSettingsModal()" title="ปิดหน้าต่าง (Close)">✖</button>
+            <div class="instructions-header">
+                <div class="instructions-title">⚙️ AUDIO SETTINGS</div>
+                <div class="instructions-subtitle">ตั้งค่าและปรับระดับเสียง BGM & SFX</div>
+            </div>
+
+            <div class="settings-content">
+                <!-- BGM Volume Slider -->
+                <div class="setting-item">
+                    <div class="setting-label-row">
+                        <span class="setting-label">🎵 MUSIC (เสียงดนตรีประกอบ):</span>
+                        <span id="bgm-volume-badge" class="setting-val-badge">60%</span>
+                    </div>
+                    <div class="slider-container">
+                        <span class="slider-icon">🔈</span>
+                        <input type="range" id="bgm-slider" min="0" max="100" value="60" class="cyber-slider" aria-label="BGM Volume">
+                        <span class="slider-icon">🔊</span>
+                    </div>
+                </div>
+
+                <!-- SFX Volume Slider -->
+                <div class="setting-item">
+                    <div class="setting-label-row">
+                        <span class="setting-label">💥 SOUND EFFECTS (เสียงเอฟเฟกต์):</span>
+                        <span id="sfx-volume-badge" class="setting-val-badge">80%</span>
+                    </div>
+                    <div class="slider-container">
+                        <span class="slider-icon">🔈</span>
+                        <input type="range" id="sfx-slider" min="0" max="100" value="80" class="cyber-slider" aria-label="SFX Volume">
+                        <span class="slider-icon">🔊</span>
+                    </div>
+                </div>
+
+                <!-- Mute All Toggle -->
+                <div class="setting-item setting-mute-row">
+                    <label for="settings-mute-toggle" class="setting-label">🔇 MUTE ALL SOUNDS (ปิดเสียงทั้งหมด):</label>
+                    <input type="checkbox" id="settings-mute-toggle" class="cyber-checkbox">
+                </div>
+            </div>
+
+            <div class="help-btn-group">
+                <button id="settings-save-btn" class="start-button resume-btn" onclick="closeSettingsModal()">✔ CLOSE (บันทึกและปิด)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stage Clear Modal Screen -->
+    <div id="stage-clear-modal" class="modal-overlay hidden">
+        <div class="clear-card" id="stage-clear-card">
+            <div class="clear-title-banner">
+                <div class="clear-title">STAGE CLEAR!</div>
+                <div class="clear-subtitle" id="clear-stage-subtitle">SONIC HAS PASSED ACT 1</div>
+            </div>
+
+            <div class="clear-stats">
+                <div class="clear-stat-row">
+                    <span class="clear-stat-label">TOTAL TIME:</span>
+                    <span id="clear-final-time" class="stat-val-neutral">0:00:00</span>
+                </div>
+                <div class="clear-stat-row tally-highlight-row">
+                    <span class="clear-stat-label">TIME BONUS:</span>
+                    <span id="clear-time-bonus" class="tally-num">+0</span>
+                </div>
+                <div class="clear-stat-row">
+                    <span class="clear-stat-label">RINGS COLLECTED:</span>
+                    <span id="clear-final-rings" class="stat-val-neutral">0</span>
+                </div>
+                <div class="clear-stat-row tally-highlight-row">
+                    <span class="clear-stat-label">RING BONUS:</span>
+                    <span id="clear-ring-bonus" class="tally-num">+0</span>
+                </div>
+                <div class="clear-stat-divider"></div>
+                <div class="clear-stat-row clear-total-row">
+                    <span class="clear-stat-label total-label">TOTAL SCORE:</span>
+                    <span id="clear-final-score" class="total-score-val">0</span>
+                </div>
+            </div>
+
+            <div id="tally-skip-hint" class="tally-skip-hint">PRESS SPACE OR CLICK TO SKIP ▶</div>
+
+            <!-- Arcade High Score Name Entry -->
+            <div id="clear-name-section" class="name-entry-card tally-post-section hidden">
+                <div class="name-entry-title">⭐ ENTER YOUR NAME TO RECORD HIGH SCORE ⭐</div>
+                <div class="name-input-group">
+                    <input type="text" id="player-name-input" maxlength="10" placeholder="SONIC" autocomplete="off" spellcheck="false" />
+                    <button id="save-score-btn" class="save-score-button">SUBMIT SCORE</button>
+                </div>
+            </div>
+
+            <!-- Leaderboard Mini View in Stage Clear -->
+            <div id="clear-leaderboard-container" class="clear-leaderboard-box hidden">
+                <div class="clear-leaderboard-title">🏆 TOP 10 HALL OF FAME</div>
+                <div id="clear-leaderboard-table-wrap"></div>
+            </div>
+
+            <div id="clear-btn-group" class="clear-btn-group tally-post-section hidden">
+                <button id="next-stage-btn" class="start-button next-stage-btn">NEXT STAGE: CHEMICAL PLANT ➔</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal Screen -->
+    <div id="game-over-modal" class="modal-overlay hidden">
+        <div class="clear-card game-over-card">
+            <div class="game-over-title">GAME OVER</div>
+            <div class="game-over-subtitle">YOU HAVE RUN OUT OF LIVES! (ชีวิตหมดแล้ว)</div>
+
+            <div class="clear-stats">
+                <div class="clear-stat-row">
+                    <span class="clear-stat-label">SURVIVED TIME:</span>
+                    <span id="gameover-final-time">0:00:00</span>
+                </div>
+                <div class="clear-stat-row">
+                    <span class="clear-stat-label">FINAL SCORE:</span>
+                    <span id="gameover-final-score">000000</span>
+                </div>
+            </div>
+
+            <!-- Arcade High Score Name Entry for Game Over -->
+            <div id="gameover-name-section" class="name-entry-card gameover-name-card">
+                <div class="name-entry-title">⭐ RECORD SCORE TO LEADERBOARD ⭐</div>
+                <div class="name-input-group">
+                    <input type="text" id="gameover-name-input" maxlength="10" placeholder="SONIC" autocomplete="off" spellcheck="false" />
+                    <button id="gameover-save-btn" class="save-score-button">SUBMIT SCORE</button>
+                </div>
+            </div>
+
+            <div id="gameover-leaderboard-container" class="clear-leaderboard-box hidden">
+                <div class="clear-leaderboard-title">🏆 TOP 10 HALL OF FAME</div>
+                <div id="gameover-leaderboard-table-wrap"></div>
+            </div>
+
+            <div class="clear-btn-group">
+                <button id="gameover-restart-btn" class="start-button gameover-btn">TRY AGAIN (เริ่มใหม่ 3 ชีวิต)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Standalone Leaderboard Modal Screen -->
+    <div id="leaderboard-modal" class="modal-overlay hidden">
+        <div class="leaderboard-card">
+            <button id="lb-close-x-btn" class="modal-close-x-btn" onclick="closeLeaderboardModal()" title="ปิดหน้าต่าง (Close)">✖</button>
+            <div class="leaderboard-header">
+                <div class="leaderboard-title">🏆 GREEN HILL LEADERBOARD</div>
+                <div class="leaderboard-subtitle">TOP 10 SPEEDRUNNERS & HIGH SCORES (หอเกียรติยศ)</div>
+            </div>
+            
+            <div id="standalone-leaderboard-table-wrap" class="leaderboard-table-container"></div>
+            
+            <div class="leaderboard-footer">
+                <button id="close-leaderboard-btn" class="start-button close-btn" onclick="closeLeaderboardModal()">BACK (ย้อนกลับ)</button>
+                <button id="reset-leaderboard-btn" class="reset-scores-btn" title="คืนค่าสถิติเริ่มต้น">Reset Defaults</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inline Immediate Modal Controller Fallback -->
+    <script>
+        function openHelpModal() {
+            if (window.game && typeof window.game.showHelpModal === 'function') {
+                window.game.showHelpModal();
+            } else {
+                const m = document.getElementById('help-modal');
+                if (m) m.classList.remove('hidden');
+            }
+        }
+        function closeHelpModal() {
+            if (window.game && typeof window.game.hideHelpModal === 'function') {
+                window.game.hideHelpModal();
+            } else {
+                const m = document.getElementById('help-modal');
+                if (m) m.classList.add('hidden');
+            }
+        }
+        function openLeaderboardModal() {
+            if (window.game && typeof window.game.showStandaloneLeaderboard === 'function') {
+                window.game.showStandaloneLeaderboard();
+            } else {
+                const m = document.getElementById('leaderboard-modal');
+                if (m) {
+                    m.classList.remove('hidden');
+                    const wrap = document.getElementById('standalone-leaderboard-table-wrap');
+                    if (window.game && window.game.leaderboard && wrap) {
+                        window.game.leaderboard.renderTable(wrap);
+                    }
+                }
+            }
+        }
+        function closeLeaderboardModal() {
+            if (window.game && typeof window.game.hideStandaloneLeaderboard === 'function') {
+                window.game.hideStandaloneLeaderboard();
+            } else {
+                const m = document.getElementById('leaderboard-modal');
+                if (m) m.classList.add('hidden');
+            }
+        }
+        function openSettingsModal() {
+            if (window.game && typeof window.game.showSettingsModal === 'function') {
+                window.game.showSettingsModal();
+            } else {
+                const m = document.getElementById('settings-modal');
+                if (m) m.classList.remove('hidden');
+            }
+        }
+        function closeSettingsModal() {
+            if (window.game && typeof window.game.hideSettingsModal === 'function') {
+                window.game.hideSettingsModal();
+            } else {
+                const m = document.getElementById('settings-modal');
+                if (m) m.classList.add('hidden');
+            }
+        }
+    </script>
+
+    <!-- Three.js (Local offline + CDN fallback) -->
+    <script src="js/three.min.js"></script>
+    <script>
+        if (!window.THREE) {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+        }
+    </script>
+    <script src="js/GLTFLoader.js"></script>
+    <script src="js/fflate.min.js"></script>
+    <script src="js/FBXLoader.js"></script>
+
+    <!-- Game Scripts (v=7.6 cache busting) -->
+    <script src="js/audio.js?v=7.6"></script>
+    <script src="js/spritesheet.js?v=7.6"></script>
+    <script src="js/sonic.js?v=7.6"></script>
+    <script src="js/world.js?v=7.6"></script>
+    <script src="js/objects.js?v=7.6"></script>
+    <script src="js/leaderboard.js?v=7.6"></script>
+    <script src="js/game.js?v=7.6"></script>
+</body>
+</html>
