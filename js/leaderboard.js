@@ -126,6 +126,9 @@ class LeaderboardManager {
             date: dateStr
         };
 
+        this.lastSubmittedEntry = newEntry;
+
+        // 1. Update Local Storage
         const localScores = this.getLocalScores();
         localScores.push(newEntry);
         localScores.sort((a, b) => {
@@ -134,18 +137,33 @@ class LeaderboardManager {
         });
 
         const localRankIndex = localScores.indexOf(newEntry);
-        const trimmed = localScores.slice(0, this.maxEntries);
-        this.saveLocalScores(trimmed);
+        const trimmedLocal = localScores.slice(0, this.maxEntries);
+        this.saveLocalScores(trimmedLocal);
 
-        // 2. Asynchronously broadcast score to Cloudflare Global API
+        // 2. Optimistically update in-memory globalScores so it appears immediately in GLOBAL view!
+        if (!this.globalScores || !Array.isArray(this.globalScores) || this.globalScores.length === 0) {
+            this.globalScores = [...this.defaultScores];
+        }
+        const existingGlobalIdx = this.globalScores.findIndex(s => s.name === newEntry.name && s.score === newEntry.score && s.timeSec === newEntry.timeSec);
+        if (existingGlobalIdx === -1) {
+            this.globalScores.push(newEntry);
+        }
+        this.globalScores.sort((a, b) => {
+            if (b.score !== a.score) return b.score - a.score;
+            return (a.timeSec || 9999) - (b.timeSec || 9999);
+        });
+        this.globalScores = this.globalScores.slice(0, this.maxEntries);
+        const globalRankIndex = this.globalScores.indexOf(newEntry);
+
+        // 3. Asynchronously broadcast score to Cloudflare Global API
         this.submitGlobalScore(newEntry).catch(e => {
             console.log('Global score submission fallback to local:', e.message);
         });
 
-        if (localRankIndex < this.maxEntries) {
-            return localRankIndex;
-        }
-        return -1;
+        const activeRank = (this.currentMode === 'global') ? globalRankIndex : localRankIndex;
+        this.lastHighlightIndex = (activeRank >= 0 && activeRank < this.maxEntries) ? activeRank : -1;
+
+        return this.lastHighlightIndex;
     }
 
     async submitGlobalScore(entry) {
@@ -190,11 +208,22 @@ class LeaderboardManager {
     renderTable(containerEl, highlightIndex = -1) {
         if (!containerEl) return;
 
+        if (highlightIndex >= 0) {
+            this.lastHighlightIndex = highlightIndex;
+        }
+        const activeHighlight = (highlightIndex >= 0) ? highlightIndex : (this.lastHighlightIndex ?? -1);
+
         const scores = this.getScores();
         const isGlobal = (this.currentMode === 'global');
         const statusBadge = this.isOnline 
             ? `<span class="lb-status-online" title="เชื่อมต่อ Cloudflare Pages สำเร็จ">🟢 GLOBAL ONLINE</span>`
             : `<span class="lb-status-local" title="ทำงานในโหมดเครื่องผู้เล่น">💾 LOCAL STORAGE</span>`;
+
+        // Hide Reset Defaults button when in GLOBAL mode
+        const resetBtn = document.getElementById('reset-leaderboard-btn');
+        if (resetBtn) {
+            resetBtn.style.display = isGlobal ? 'none' : 'inline-block';
+        }
 
         let rowsHtml = '';
         scores.forEach((entry, idx) => {
@@ -213,7 +242,12 @@ class LeaderboardManager {
                 rankClass = 'rank-bronze';
             }
 
-            const isHighlight = (idx === highlightIndex);
+            // Highlight ONLY the row belonging to the user's submitted name
+            const isPlayerEntry = Boolean(this.lastSubmittedEntry && entry.name === this.lastSubmittedEntry.name && (
+                (entry.score === this.lastSubmittedEntry.score && entry.timeSec === this.lastSubmittedEntry.timeSec) ||
+                (idx === activeHighlight)
+            ));
+            const isHighlight = isPlayerEntry;
             const rowClass = isHighlight ? 'leaderboard-row highlight-player-row' : 'leaderboard-row';
 
             rowsHtml += `
@@ -297,14 +331,15 @@ window.addEventListener('leaderboard-updated', () => {
     const gameoverWrap = document.getElementById('gameover-leaderboard-table-wrap');
 
     if (window.game && window.game.leaderboard) {
+        const highlight = window.game.leaderboard.lastHighlightIndex ?? -1;
         if (standaloneWrap && standaloneWrap.offsetParent !== null) {
-            window.game.leaderboard.renderTable(standaloneWrap);
+            window.game.leaderboard.renderTable(standaloneWrap, highlight);
         }
         if (clearWrap && clearWrap.offsetParent !== null) {
-            window.game.leaderboard.renderTable(clearWrap);
+            window.game.leaderboard.renderTable(clearWrap, highlight);
         }
         if (gameoverWrap && gameoverWrap.offsetParent !== null) {
-            window.game.leaderboard.renderTable(gameoverWrap);
+            window.game.leaderboard.renderTable(gameoverWrap, highlight);
         }
     }
 });

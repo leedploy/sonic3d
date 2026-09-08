@@ -966,6 +966,16 @@ class SonicGame {
         if (this.gameOverModal) this.gameOverModal.classList.add('hidden');
         this.hideStandaloneLeaderboard();
 
+        const startScreen = document.getElementById('start-screen');
+        if (startScreen) startScreen.classList.add('hidden');
+        if (this.startBgVideo) {
+            try { this.startBgVideo.pause(); } catch (e) {}
+        }
+
+        // Reset to Stage 1 (Green Hill Zone)
+        this.currentStageId = 'green_hill';
+        this.setStage('green_hill');
+
         // Reset Lives & Counters
         this.lives = 3;
         this.isDying = false;
@@ -1275,6 +1285,19 @@ class SonicGame {
         if (!this.leaderboardModal) return;
         this.isLeaderboardOpen = true;
         this.leaderboardModal.classList.remove('hidden');
+
+        // Only show PLAY AGAIN button if coming from Game Over or Stage Clear
+        const playAgainBtn = document.getElementById('lb-play-again-btn');
+        if (playAgainBtn) {
+            if (this.state === 'GAMEOVER' || this.state === 'CLEARED') {
+                playAgainBtn.classList.remove('hidden');
+                playAgainBtn.style.display = 'inline-flex';
+            } else {
+                playAgainBtn.classList.add('hidden');
+                playAgainBtn.style.display = 'none';
+            }
+        }
+
         if (this.standaloneLeaderboardTableWrap) {
             this.leaderboard.renderTable(this.standaloneLeaderboardTableWrap, highlightRank);
         }
@@ -1553,8 +1576,8 @@ class SonicGame {
             }
         }
 
-        // 1-UP: Every 100 rings awards an extra life
-        const hundredRings = Math.floor(this.sonic.rings / 100);
+        // 1-UP: Every 300 rings awards an extra life
+        const hundredRings = Math.floor(this.sonic.rings / 300);
         if (hundredRings > this.lastHundredRings) {
             const extraLives = hundredRings - this.lastHundredRings;
             this.lives += extraLives;
@@ -1562,7 +1585,7 @@ class SonicGame {
             if (window.soundManager && window.soundManager.playOneUp) {
                 window.soundManager.playOneUp();
             }
-            this.showRespawnToast(`🌟 1-UP! EXTRA LIFE! (ชีวิต +${extraLives} -> ${this.lives})`);
+            this.showRespawnToast(`🌟 1-UP! 300 RINGS! (ชีวิต +${extraLives} -> ${this.lives})`);
         } else if (hundredRings < this.lastHundredRings) {
             this.lastHundredRings = hundredRings;
         }
