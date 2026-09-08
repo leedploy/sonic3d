@@ -1237,8 +1237,15 @@ class SonicGame {
     showStandaloneLeaderboard() {
         if (!this.leaderboardModal) return;
         this.isLeaderboardOpen = true;
-        this.leaderboard.renderTable(this.standaloneLeaderboardTableWrap);
         this.leaderboardModal.classList.remove('hidden');
+        this.leaderboard.renderTable(this.standaloneLeaderboardTableWrap);
+        if (this.leaderboard.currentMode === 'global') {
+            this.leaderboard.fetchGlobalScores().then(() => {
+                if (this.isLeaderboardOpen) {
+                    this.leaderboard.renderTable(this.standaloneLeaderboardTableWrap);
+                }
+            });
+        }
     }
 
     hideStandaloneLeaderboard() {

@@ -1449,6 +1449,117 @@ body, html {
     letter-spacing: 1px;
 }
 
+/* Leaderboard Toolbar & Global/Local Controls */
+.lb-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.lb-mode-toggle {
+    display: flex;
+    background: rgba(0, 12, 34, 0.8);
+    border-radius: 20px;
+    padding: 3px;
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.lb-mode-btn {
+    font-family: var(--font-arcade);
+    font-size: 10px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 16px;
+    background: transparent;
+    color: #8ea8db;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+    letter-spacing: 0.5px;
+}
+
+.lb-mode-btn:hover {
+    color: #ffffff;
+}
+
+.lb-mode-btn.active {
+    background: linear-gradient(180deg, #ffd700 0%, #ff9500 100%);
+    color: #051026;
+    font-weight: bold;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+}
+
+.lb-status-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lb-status-online {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-arcade);
+    font-size: 10px;
+    color: #00ff88;
+    background: rgba(0, 255, 136, 0.14);
+    border: 1px solid rgba(0, 255, 136, 0.6);
+    padding: 4px 10px;
+    border-radius: 12px;
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.7);
+    letter-spacing: 0.5px;
+}
+
+.lb-status-local {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-arcade);
+    font-size: 10px;
+    color: #ffb700;
+    background: rgba(255, 183, 0, 0.14);
+    border: 1px solid rgba(255, 183, 0, 0.6);
+    padding: 4px 10px;
+    border-radius: 12px;
+    text-shadow: 0 0 8px rgba(255, 183, 0, 0.5);
+    letter-spacing: 0.5px;
+}
+
+.lb-refresh-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.lb-refresh-btn:hover {
+    background: rgba(0, 240, 255, 0.3);
+    border-color: #00f0ff;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+    transform: scale(1.1);
+}
+
+.lb-refresh-btn.spinning {
+    animation: spinRefresh 0.8s linear infinite;
+}
+
+@keyframes spinRefresh {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 .leaderboard-table-container {
     width: 100%;
     overflow-x: auto;
