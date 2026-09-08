@@ -851,10 +851,11 @@
 
             <!-- Arcade High Score Name Entry -->
             <div id="clear-name-section" class="name-entry-card tally-post-section hidden">
-                <div class="name-entry-title">⭐ ENTER YOUR NAME TO RECORD HIGH SCORE ⭐</div>
+                <div class="name-entry-title">👑 RECORD GRAND CHAMPION SCORE TO LEADERBOARD 👑</div>
+                <div class="name-entry-hint">พิมพ์ชื่อของคุณ (ไทย/ENG) แล้วกดปุ่มเพื่อบันทึกสถิติ:</div>
                 <div class="name-input-group">
-                    <input type="text" id="player-name-input" maxlength="16" placeholder="SONIC" autocomplete="off" spellcheck="false" />
-                    <button id="save-score-btn" class="save-score-button">SUBMIT SCORE</button>
+                    <input type="text" id="player-name-input" maxlength="16" placeholder="ใส่ชื่อของคุณ" autocomplete="off" spellcheck="false" />
+                    <button id="save-score-btn" class="save-score-button submit-gold-btn" onclick="window.submitPlayerScore()">💾 SUBMIT SCORE</button>
                 </div>
             </div>
 
@@ -889,10 +890,11 @@
 
             <!-- Arcade High Score Name Entry for Game Over -->
             <div id="gameover-name-section" class="name-entry-card gameover-name-card">
-                <div class="name-entry-title">⭐ RECORD SCORE TO LEADERBOARD ⭐</div>
+                <div class="name-entry-title">🏆 บันทึกคะแนนลง LEADERBOARD 🏆</div>
+                <div class="name-entry-hint">พิมพ์ชื่อของคุณ (ไทย/ENG) แล้วกด SUBMIT เพื่อขึ้นตารางอันดับ:</div>
                 <div class="name-input-group">
-                    <input type="text" id="gameover-name-input" maxlength="16" placeholder="SONIC" autocomplete="off" spellcheck="false" />
-                    <button id="gameover-save-btn" class="save-score-button">SUBMIT SCORE</button>
+                    <input type="text" id="gameover-name-input" maxlength="16" placeholder="ใส่ชื่อของคุณ" autocomplete="off" spellcheck="false" />
+                    <button id="gameover-save-btn" class="save-score-button submit-gold-btn" onclick="window.submitGameOverScore()">💾 SUBMIT SCORE</button>
                 </div>
             </div>
 
@@ -919,6 +921,7 @@
             <div id="standalone-leaderboard-table-wrap" class="leaderboard-table-container"></div>
             
             <div class="leaderboard-footer">
+                <button id="lb-play-again-btn" class="start-button play-again-lb-btn" onclick="restartGameFromLeaderboard()">🎮 PLAY AGAIN (เริ่มใหม่ 3 ชีวิต)</button>
                 <button id="close-leaderboard-btn" class="start-button close-btn" onclick="closeLeaderboardModal()">BACK (ย้อนกลับ)</button>
                 <button id="reset-leaderboard-btn" class="reset-scores-btn" title="คืนค่าสถิติเริ่มต้น">Reset Defaults</button>
             </div>
@@ -965,6 +968,22 @@
                 if (m) m.classList.add('hidden');
             }
         }
+        function restartGameFromLeaderboard() {
+            closeLeaderboardModal();
+            if (window.game && typeof window.game.restartGame === 'function') {
+                window.game.restartGame();
+            }
+        }
+        function submitGameOverScore() {
+            if (window.game && typeof window.game.submitGameOverScore === 'function') {
+                window.game.submitGameOverScore();
+            }
+        }
+        function submitPlayerScore() {
+            if (window.game && typeof window.game.submitPlayerScore === 'function') {
+                window.game.submitPlayerScore();
+            }
+        }
         function openSettingsModal() {
             if (window.game && typeof window.game.showSettingsModal === 'function') {
                 window.game.showSettingsModal();
@@ -994,13 +1013,13 @@
     <script src="js/fflate.min.js"></script>
     <script src="js/FBXLoader.js"></script>
 
-    <!-- Game Scripts (v=7.6 cache busting) -->
-    <script src="js/audio.js?v=7.6"></script>
-    <script src="js/spritesheet.js?v=7.6"></script>
-    <script src="js/sonic.js?v=7.6"></script>
-    <script src="js/world.js?v=7.6"></script>
-    <script src="js/objects.js?v=7.6"></script>
-    <script src="js/leaderboard.js?v=7.6"></script>
-    <script src="js/game.js?v=7.6"></script>
+    <!-- Game Scripts (v=7.7 cache busting) -->
+    <script src="js/audio.js?v=7.7"></script>
+    <script src="js/spritesheet.js?v=7.7"></script>
+    <script src="js/sonic.js?v=7.7"></script>
+    <script src="js/world.js?v=7.7"></script>
+    <script src="js/objects.js?v=7.7"></script>
+    <script src="js/leaderboard.js?v=7.7"></script>
+    <script src="js/game.js?v=7.7"></script>
 </body>
 </html>

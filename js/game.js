@@ -380,9 +380,7 @@ class SonicGame {
         }
 
         // Save score button in Stage Clear
-        if (this.saveScoreBtn) {
-            this.saveScoreBtn.addEventListener('click', () => this.submitPlayerScore());
-        }
+        bindButton(this.saveScoreBtn, () => this.submitPlayerScore());
 
         if (this.playerNameInput) {
             this.playerNameInput.addEventListener('keydown', (e) => {
@@ -430,9 +428,7 @@ class SonicGame {
 
         // Game Over modal buttons
         const gameoverSaveBtn = document.getElementById('gameover-save-btn');
-        if (gameoverSaveBtn) {
-            gameoverSaveBtn.addEventListener('click', () => this.submitGameOverScore());
-        }
+        bindButton(gameoverSaveBtn, () => this.submitGameOverScore());
 
         const gameoverNameInput = document.getElementById('gameover-name-input');
         if (gameoverNameInput) {
@@ -445,9 +441,7 @@ class SonicGame {
         }
 
         const gameoverRestartBtn = document.getElementById('gameover-restart-btn');
-        if (gameoverRestartBtn) {
-            gameoverRestartBtn.addEventListener('click', () => this.restartGame());
-        }
+        bindButton(gameoverRestartBtn, () => this.restartGame());
 
         // In-Game Help Button & Modal Buttons
         const hudHelpBtn = document.getElementById('hud-help-btn');
@@ -1245,7 +1239,7 @@ class SonicGame {
             if (this.clearBtnGroup) this.clearBtnGroup.classList.remove('hidden');
 
             if (this.playerNameInput) {
-                this.playerNameInput.value = 'SONIC';
+                this.playerNameInput.value = this.lastPlayerName || 'SONIC';
                 setTimeout(() => {
                     try {
                         this.playerNameInput.focus();
@@ -1277,15 +1271,17 @@ class SonicGame {
         }
     }
 
-    showStandaloneLeaderboard() {
+    showStandaloneLeaderboard(highlightRank = -1) {
         if (!this.leaderboardModal) return;
         this.isLeaderboardOpen = true;
         this.leaderboardModal.classList.remove('hidden');
-        this.leaderboard.renderTable(this.standaloneLeaderboardTableWrap);
+        if (this.standaloneLeaderboardTableWrap) {
+            this.leaderboard.renderTable(this.standaloneLeaderboardTableWrap, highlightRank);
+        }
         if (this.leaderboard.currentMode === 'global') {
             this.leaderboard.fetchGlobalScores().then(() => {
-                if (this.isLeaderboardOpen) {
-                    this.leaderboard.renderTable(this.standaloneLeaderboardTableWrap);
+                if (this.isLeaderboardOpen && this.standaloneLeaderboardTableWrap) {
+                    this.leaderboard.renderTable(this.standaloneLeaderboardTableWrap, highlightRank);
                 }
             });
         }
@@ -1299,41 +1295,46 @@ class SonicGame {
     }
 
     submitPlayerScore() {
-        if (!this.playerNameInput) return;
-        const name = this.playerNameInput.value.trim() || 'SONIC';
-        const totalRunTime = (this.totalRunTime || 0) + this.gameTime;
-        const rankIdx = this.leaderboard.addScore(name, this.lastCalculatedScore, totalRunTime, this.sonic.rings);
+        const rawName = this.playerNameInput ? this.playerNameInput.value.trim() : '';
+        const name = rawName || this.lastPlayerName || 'SONIC';
+        this.lastPlayerName = name;
 
-        if (this.clearNameSection) this.clearNameSection.classList.add('hidden');
-        if (this.clearLeaderboardContainer) this.clearLeaderboardContainer.classList.remove('hidden');
-        if (this.clearLeaderboardTableWrap) {
-            this.leaderboard.renderTable(this.clearLeaderboardTableWrap, rankIdx);
+        const totalRunTime = (this.totalRunTime || 0) + this.gameTime;
+        const finalScore = this.lastCalculatedScore || (this.sonic ? this.sonic.score : 0);
+        const finalRings = this.sonic ? this.sonic.rings : 0;
+        const rankIdx = this.leaderboard.addScore(name, finalScore, totalRunTime, finalRings);
+
+        if (this.stageClearScreen) {
+            this.stageClearScreen.classList.add('hidden');
         }
 
         if (window.soundManager && window.soundManager.playGoal) {
             window.soundManager.playGoal();
         }
+
+        this.showStandaloneLeaderboard(rankIdx);
     }
 
     submitGameOverScore() {
         const gameoverNameInput = document.getElementById('gameover-name-input');
-        const gameoverNameSection = document.getElementById('gameover-name-section');
-        const gameoverLeaderboardContainer = document.getElementById('gameover-leaderboard-container');
-        const gameoverLeaderboardTableWrap = document.getElementById('gameover-leaderboard-table-wrap');
+        const rawName = gameoverNameInput ? gameoverNameInput.value.trim() : '';
+        const name = rawName || this.lastPlayerName || 'SONIC';
+        this.lastPlayerName = name;
 
-        const name = (gameoverNameInput ? gameoverNameInput.value.trim() : '') || 'SONIC';
         const totalRunTime = (this.totalRunTime || 0) + this.gameTime;
-        const rankIdx = this.leaderboard.addScore(name, this.lastCalculatedScore, totalRunTime, this.sonic.rings);
+        const finalScore = this.lastCalculatedScore || (this.sonic ? this.sonic.score : 0);
+        const finalRings = this.sonic ? this.sonic.rings : 0;
+        const rankIdx = this.leaderboard.addScore(name, finalScore, totalRunTime, finalRings);
 
-        if (gameoverNameSection) gameoverNameSection.classList.add('hidden');
-        if (gameoverLeaderboardContainer) gameoverLeaderboardContainer.classList.remove('hidden');
-        if (gameoverLeaderboardTableWrap) {
-            this.leaderboard.renderTable(gameoverLeaderboardTableWrap, rankIdx);
+        if (this.gameOverModal) {
+            this.gameOverModal.classList.add('hidden');
         }
 
         if (window.soundManager && window.soundManager.playGoal) {
             window.soundManager.playGoal();
         }
+
+        this.showStandaloneLeaderboard(rankIdx);
     }
 
     resetCameraView() {
@@ -1728,7 +1729,7 @@ class SonicGame {
         if (gameoverNameSection) gameoverNameSection.classList.remove('hidden');
         if (gameoverLeaderboardContainer) gameoverLeaderboardContainer.classList.add('hidden');
         if (gameoverNameInput) {
-            gameoverNameInput.value = 'SONIC';
+            gameoverNameInput.value = this.lastPlayerName || 'SONIC';
             setTimeout(() => {
                 try {
                     gameoverNameInput.focus();
@@ -1876,6 +1877,30 @@ window.closeSettingsModal = () => {
     } else {
         const m = document.getElementById('settings-modal');
         if (m) m.classList.add('hidden');
+    }
+};
+
+window.submitGameOverScore = () => {
+    if (window.game && typeof window.game.submitGameOverScore === 'function') {
+        window.game.submitGameOverScore();
+    }
+};
+
+window.submitPlayerScore = () => {
+    if (window.game && typeof window.game.submitPlayerScore === 'function') {
+        window.game.submitPlayerScore();
+    }
+};
+
+window.restartGameFromLeaderboard = () => {
+    if (window.game && typeof window.game.hideStandaloneLeaderboard === 'function') {
+        window.game.hideStandaloneLeaderboard();
+    } else {
+        const m = document.getElementById('leaderboard-modal');
+        if (m) m.classList.add('hidden');
+    }
+    if (window.game && typeof window.game.restartGame === 'function') {
+        window.game.restartGame();
     }
 };
 

@@ -1354,28 +1354,49 @@ body, html {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 18px rgba(255, 215, 0, 0.6);
 }
 
-/* Name Entry Card in Stage Clear */
+/* Name Entry Card in Stage Clear & Game Over */
 .name-entry-card {
-    margin-top: 18px;
-    background: rgba(0, 30, 80, 0.85);
-    border: 2px solid var(--sonic-cyan);
-    border-radius: 12px;
+    margin-top: 14px;
+    background: rgba(0, 28, 70, 0.9);
+    border: 2px solid #ffd700;
+    border-radius: 14px;
     padding: 14px 20px;
     width: 100%;
     max-width: 480px;
-    box-shadow: inset 0 0 12px rgba(0, 240, 255, 0.25);
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.35), inset 0 0 14px rgba(0, 240, 255, 0.2);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    animation: nameCardGlow 2.5s infinite alternate ease-in-out;
+}
+
+@keyframes nameCardGlow {
+    0% {
+        box-shadow: 0 0 12px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(255, 215, 0, 0.15);
+        border-color: #ffd700;
+    }
+    100% {
+        box-shadow: 0 0 25px rgba(0, 240, 255, 0.7), inset 0 0 20px rgba(0, 240, 255, 0.25);
+        border-color: #00f0ff;
+    }
 }
 
 .name-entry-title {
     font-family: var(--font-arcade);
     font-size: 11px;
-    color: var(--sonic-cyan);
+    color: #ffd700;
     letter-spacing: 1px;
     text-align: center;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+.name-entry-hint {
+    font-family: 'Kanit', sans-serif;
+    font-size: 12px;
+    color: #c8e0ff;
+    text-align: center;
+    letter-spacing: 0.5px;
 }
 
 .name-input-group {
@@ -1383,46 +1404,67 @@ body, html {
     gap: 10px;
     width: 100%;
     justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
-#player-name-input {
+#player-name-input,
+#gameover-name-input {
     background: #061128;
     border: 2px solid #ffd700;
     border-radius: 8px;
     color: #ffffff;
-    font-family: var(--font-arcade);
-    font-size: 16px;
+    font-family: var(--font-arcade), 'Kanit', sans-serif;
+    font-size: 15px;
+    font-weight: bold;
     text-transform: uppercase;
     padding: 8px 14px;
-    width: 160px;
+    min-width: 170px;
+    max-width: 220px;
     text-align: center;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     outline: none;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.35);
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-#player-name-input:focus {
+#player-name-input:focus,
+#gameover-name-input:focus {
     border-color: #00f0ff;
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+    box-shadow: 0 0 18px rgba(0, 240, 255, 0.75);
+    background: #091a3c;
 }
 
 .save-score-button {
     background: linear-gradient(180deg, #ffc700 0%, #e68000 100%);
     border: 2px solid #ffffff;
     border-radius: 8px;
-    color: #000;
+    color: #051026;
     font-family: var(--font-arcade);
     font-size: 12px;
     font-weight: bold;
-    padding: 8px 18px;
+    padding: 9px 18px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    transition: transform 0.15s, filter 0.15s;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 200, 0, 0.4);
+    transition: transform 0.15s, filter 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
 .save-score-button:hover {
     transform: scale(1.05);
-    filter: brightness(1.15);
+    filter: brightness(1.18);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 215, 0, 0.8);
+}
+
+.save-score-button:active {
+    transform: scale(0.97);
+}
+
+.submit-gold-btn {
+    background: linear-gradient(180deg, #ffd700 0%, #ff8c00 100%) !important;
+    border-color: #ffffff !important;
+    color: #051026 !important;
 }
 
 /* Clear modal mini leaderboard */
@@ -1818,8 +1860,38 @@ body, html {
 }
 
 .gameover-name-card {
-    border-color: #e6222b !important;
-    box-shadow: inset 0 0 12px rgba(230, 34, 43, 0.3) !important;
+    background: rgba(45, 10, 20, 0.92) !important;
+    border: 2px solid #ff3b47 !important;
+    box-shadow: 0 0 16px rgba(255, 59, 71, 0.4), inset 0 0 15px rgba(255, 59, 71, 0.25) !important;
+    animation: gameoverCardGlow 2.5s infinite alternate ease-in-out !important;
+}
+
+@keyframes gameoverCardGlow {
+    0% {
+        box-shadow: 0 0 12px rgba(255, 59, 71, 0.4), inset 0 0 12px rgba(255, 59, 71, 0.2);
+        border-color: #ff3b47;
+    }
+    100% {
+        box-shadow: 0 0 24px rgba(255, 215, 0, 0.7), inset 0 0 18px rgba(255, 215, 0, 0.3);
+        border-color: #ffd700;
+    }
+}
+
+.play-again-lb-btn {
+    background: linear-gradient(180deg, #00e575 0%, #008f39 100%) !important;
+    color: #ffffff !important;
+    border-color: #ffd700 !important;
+    box-shadow: 0 4px 15px rgba(0, 200, 80, 0.6) !important;
+    font-size: 11px !important;
+    padding: 10px 20px !important;
+    margin-top: 0 !important;
+    letter-spacing: 0.5px;
+}
+
+.play-again-lb-btn:hover {
+    background: linear-gradient(180deg, #33ff99 0%, #00b347 100%) !important;
+    box-shadow: 0 6px 22px rgba(0, 255, 120, 0.8) !important;
+    transform: translateY(-2px) scale(1.04);
 }
 
 /* 3... 2... 1... GO! Rocket Start Countdown Overlay */

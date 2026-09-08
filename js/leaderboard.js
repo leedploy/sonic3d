@@ -126,6 +126,7 @@ class LeaderboardManager {
             date: dateStr
         };
 
+        const localScores = this.getLocalScores();
         localScores.push(newEntry);
         localScores.sort((a, b) => {
             if (b.score !== a.score) return b.score - a.score;
