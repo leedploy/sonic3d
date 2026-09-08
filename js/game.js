@@ -81,6 +81,7 @@ class SonicGame {
         // Game State
         this.state = 'START'; // START, PLAYING, CLEARED, GAMEOVER
         this.gameTime = 0;
+        this.totalRunTime = 0;
         this.lastFrameTime = performance.now();
 
         // Input state
@@ -595,6 +596,7 @@ class SonicGame {
             if (this.startBgVideo) {
                 try { this.startBgVideo.pause(); } catch (e) {}
             }
+            this.totalRunTime = 0;
             this.startCountdown();
         }
     }
@@ -635,8 +637,18 @@ class SonicGame {
         this.clearAllTallyTimers();
         this.isTallying = false;
 
+        const isFinalStage = (this.currentStageId === 'hydrocity');
+        if (isFinalStage) {
+            // Completed all stages! Restart full campaign run
+            this.restartGame();
+            return;
+        }
+
+        // Accumulate completed stage time into full run
+        this.totalRunTime = (this.totalRunTime || 0) + this.gameTime;
+
         const stageCfg = this.stageConfigs[this.currentStageId];
-        const nextId = (stageCfg && stageCfg.nextStage) ? stageCfg.nextStage : 'green_hill';
+        const nextId = (stageCfg && stageCfg.nextStage) ? stageCfg.nextStage : 'chemical_plant';
         this.selectZone(nextId);
 
         // Reset Sonic position to start line
@@ -659,6 +671,17 @@ class SonicGame {
         this.gameTime = 0;
         this.activeCheckpoint = null;
         this.isDying = false;
+
+        // Reset rings for the next zone, carry over accumulated score
+        if (this.objects && this.objects.rings) {
+            this.objects.rings.forEach(r => {
+                r.collected = false;
+                r.group.visible = true;
+            });
+        }
+        this.sonic.rings = 0;
+        this.sonic.score = this.lastCalculatedScore;
+        this.updateHUD();
 
         // Start countdown with the new zone's music & banner!
         this.startCountdown();
@@ -891,6 +914,7 @@ class SonicGame {
         this.cameraYaw = Math.PI;
         this.sonic.rings = 0;
         this.sonic.score = 0;
+        this.totalRunTime = 0;
         this.sonic.boostEnergy = 100;
         this.sonic.isGrounded = true;
         this.sonic.isJumping = false;
@@ -954,6 +978,7 @@ class SonicGame {
         this.lastHundredRings = 0;
 
         this.gameTime = 0;
+        this.totalRunTime = 0;
         this.sonic.position.set(0, 1.5, 5);
         this.sonic.rotationY = Math.PI;
         this.sonic.forwardSpeed = 0;
@@ -1033,17 +1058,28 @@ class SonicGame {
         this.lastTimeBonus = timeBonus;
         this.lastRingBonus = ringBonus;
 
+        const isFinalStage = (this.currentStageId === 'hydrocity');
+        const clearTitleEl = document.querySelector('#stage-clear-card .clear-title');
         const clearSubEl = document.getElementById('clear-stage-subtitle');
         const nextBtn = document.getElementById('next-stage-btn');
-        if (this.currentStageId === 'hydrocity') {
-            if (clearSubEl) clearSubEl.textContent = 'SONIC HAS PASSED HYDROCITY ZONE!';
-            if (nextBtn) nextBtn.textContent = 'PLAY GREEN HILL ZONE ➔';
-        } else if (this.currentStageId === 'chemical_plant') {
-            if (clearSubEl) clearSubEl.textContent = 'SONIC HAS PASSED CHEMICAL PLANT ZONE!';
-            if (nextBtn) nextBtn.textContent = 'NEXT STAGE: HYDROCITY ➔';
+
+        if (isFinalStage) {
+            if (clearTitleEl) clearTitleEl.textContent = '🏆 ALL STAGES CLEARED!';
+            if (clearSubEl) clearSubEl.textContent = 'CONGRATULATIONS! YOU CONQUERED ALL 3 ZONES!';
+            if (nextBtn) {
+                nextBtn.textContent = 'PLAY AGAIN (เริ่มเล่นใหม่) ↺';
+                nextBtn.classList.add('grand-victory-btn');
+            }
         } else {
-            if (clearSubEl) clearSubEl.textContent = 'SONIC HAS PASSED GREEN HILL ZONE!';
-            if (nextBtn) nextBtn.textContent = 'NEXT STAGE: CHEMICAL PLANT ➔';
+            if (clearTitleEl) clearTitleEl.textContent = 'STAGE CLEAR!';
+            if (nextBtn) nextBtn.classList.remove('grand-victory-btn');
+            if (this.currentStageId === 'chemical_plant') {
+                if (clearSubEl) clearSubEl.textContent = 'SONIC HAS PASSED CHEMICAL PLANT ZONE!';
+                if (nextBtn) nextBtn.textContent = 'NEXT STAGE: HYDROCITY ➔';
+            } else {
+                if (clearSubEl) clearSubEl.textContent = 'SONIC HAS PASSED GREEN HILL ZONE!';
+                if (nextBtn) nextBtn.textContent = 'NEXT STAGE: CHEMICAL PLANT ➔';
+            }
         }
 
         // Populate initial tally state
@@ -1173,6 +1209,9 @@ class SonicGame {
         this.isTallying = false;
         this.clearAllTallyTimers();
 
+        // Carry over accumulated score to Sonic
+        this.sonic.score = targetTotalScore;
+
         if (this.clearTimeBonusEl) {
             this.clearTimeBonusEl.textContent = `+${targetTimeBonus.toLocaleString()}`;
             this.clearTimeBonusEl.classList.add('tally-finished');
@@ -1192,19 +1231,33 @@ class SonicGame {
             window.soundManager.playScoreTotal();
         }
 
-        // Hide skip prompt, reveal name entry & buttons
+        // Hide skip prompt
         if (this.tallySkipHint) this.tallySkipHint.classList.add('hidden');
-        if (this.clearNameSection) this.clearNameSection.classList.remove('hidden');
-        if (this.clearBtnGroup) this.clearBtnGroup.classList.remove('hidden');
 
-        if (this.playerNameInput) {
-            this.playerNameInput.value = 'SONIC';
-            setTimeout(() => {
-                try {
-                    this.playerNameInput.focus();
-                    this.playerNameInput.select();
-                } catch (e) {}
-            }, 200);
+        const isFinalStage = (this.currentStageId === 'hydrocity');
+        if (isFinalStage) {
+            // ONLY reveal name entry on the final stage!
+            if (this.clearNameSection) {
+                const nameTitle = this.clearNameSection.querySelector('.name-entry-title');
+                if (nameTitle) nameTitle.textContent = '👑 RECORD YOUR GRAND CHAMPION SCORE TO LEADERBOARD 👑';
+                this.clearNameSection.classList.remove('hidden');
+            }
+            if (this.clearBtnGroup) this.clearBtnGroup.classList.remove('hidden');
+
+            if (this.playerNameInput) {
+                this.playerNameInput.value = 'SONIC';
+                setTimeout(() => {
+                    try {
+                        this.playerNameInput.focus();
+                        this.playerNameInput.select();
+                    } catch (e) {}
+                }, 200);
+            }
+        } else {
+            // Intermediate stages (Act 1 & Act 2): Hide name entry & leaderboard, show only Next Stage button!
+            if (this.clearNameSection) this.clearNameSection.classList.add('hidden');
+            if (this.clearLeaderboardContainer) this.clearLeaderboardContainer.classList.add('hidden');
+            if (this.clearBtnGroup) this.clearBtnGroup.classList.remove('hidden');
         }
     }
 
@@ -1248,7 +1301,8 @@ class SonicGame {
     submitPlayerScore() {
         if (!this.playerNameInput) return;
         const name = this.playerNameInput.value.trim() || 'SONIC';
-        const rankIdx = this.leaderboard.addScore(name, this.lastCalculatedScore, this.gameTime, this.sonic.rings);
+        const totalRunTime = (this.totalRunTime || 0) + this.gameTime;
+        const rankIdx = this.leaderboard.addScore(name, this.lastCalculatedScore, totalRunTime, this.sonic.rings);
 
         if (this.clearNameSection) this.clearNameSection.classList.add('hidden');
         if (this.clearLeaderboardContainer) this.clearLeaderboardContainer.classList.remove('hidden');
@@ -1268,7 +1322,8 @@ class SonicGame {
         const gameoverLeaderboardTableWrap = document.getElementById('gameover-leaderboard-table-wrap');
 
         const name = (gameoverNameInput ? gameoverNameInput.value.trim() : '') || 'SONIC';
-        const rankIdx = this.leaderboard.addScore(name, this.lastCalculatedScore, this.gameTime, this.sonic.rings);
+        const totalRunTime = (this.totalRunTime || 0) + this.gameTime;
+        const rankIdx = this.leaderboard.addScore(name, this.lastCalculatedScore, totalRunTime, this.sonic.rings);
 
         if (gameoverNameSection) gameoverNameSection.classList.add('hidden');
         if (gameoverLeaderboardContainer) gameoverLeaderboardContainer.classList.remove('hidden');
@@ -1659,6 +1714,7 @@ class SonicGame {
 
         const finalScore = this.sonic.score;
         this.lastCalculatedScore = finalScore;
+        const finalTime = (this.totalRunTime || 0) + this.gameTime;
 
         const gameoverFinalTime = document.getElementById('gameover-final-time');
         const gameoverFinalScore = document.getElementById('gameover-final-score');
@@ -1667,7 +1723,7 @@ class SonicGame {
         const gameoverNameInput = document.getElementById('gameover-name-input');
 
         if (gameoverFinalScore) gameoverFinalScore.textContent = finalScore.toLocaleString();
-        if (gameoverFinalTime) gameoverFinalTime.textContent = this.formatTime(this.gameTime);
+        if (gameoverFinalTime) gameoverFinalTime.textContent = this.formatTime(finalTime);
 
         if (gameoverNameSection) gameoverNameSection.classList.remove('hidden');
         if (gameoverLeaderboardContainer) gameoverLeaderboardContainer.classList.add('hidden');

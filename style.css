@@ -1294,6 +1294,45 @@ body, html {
     margin: 0;
 }
 
+.next-stage-btn {
+    background: linear-gradient(180deg, #00f0ff 0%, #0066ff 100%) !important;
+    border: 2px solid #ffd700 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 22px rgba(0, 240, 255, 0.6), 0 6px 20px rgba(0, 0, 0, 0.6) !important;
+    animation: nextStagePulse 1.8s infinite alternate ease-in-out;
+}
+
+@keyframes nextStagePulse {
+    from {
+        transform: scale(1);
+        box-shadow: 0 0 16px rgba(0, 240, 255, 0.5);
+    }
+    to {
+        transform: scale(1.03);
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.9), 0 0 12px #ffd700;
+    }
+}
+
+.grand-victory-btn {
+    background: linear-gradient(180deg, #ffd700 0%, #ff8800 100%) !important;
+    color: #051026 !important;
+    font-weight: 900 !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), 0 6px 20px rgba(0, 0, 0, 0.7) !important;
+    animation: grandVictoryPulse 1.6s infinite alternate ease-in-out;
+}
+
+@keyframes grandVictoryPulse {
+    from {
+        transform: scale(1);
+        box-shadow: 0 0 18px rgba(255, 215, 0, 0.6);
+    }
+    to {
+        transform: scale(1.04);
+        box-shadow: 0 0 35px rgba(255, 215, 0, 1), 0 0 15px #ffffff;
+    }
+}
+
 .leaderboard-button {
     padding: 14px 28px;
     font-family: var(--font-arcade);
