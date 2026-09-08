@@ -795,7 +795,7 @@ class SonicGame {
 
                     // If rocket start was charged, launch immediately!
                     if (this.isRocketStartCharged) {
-                        this.sonic.triggerRocketStart(62);
+                        this.sonic.triggerRocketStart(48);
                         this.showRespawnToast('🚀 ROCKET START! SUPER SPEED BLAST! (+500 PTS)');
                         this.isRocketStartCharged = false;
                     }
@@ -1435,8 +1435,8 @@ class SonicGame {
         }
 
         // High speed camera vibration / shake
-        if (speed > 35 && Math.abs(this.orbitYawOffset) < 0.5) {
-            const shake = (speed - 35) * 0.003;
+        if (speed > 32 && Math.abs(this.orbitYawOffset) < 0.5) {
+            const shake = (speed - 32) * 0.003;
             this.camera.position.x += (Math.random() - 0.5) * shake;
             this.camera.position.y += (Math.random() - 0.5) * shake;
         }
@@ -1573,7 +1573,7 @@ class SonicGame {
             // Speedometer in KM/H (speed * 3.6 for realistic platformer scaling)
             const kmh = Math.floor(this.sonic.currentSpeed * 3.6);
             this.speedEl.textContent = `${kmh} KM/H`;
-            if (kmh > 200) {
+            if (kmh > 170) {
                 this.speedEl.style.color = '#ffde00';
             } else {
                 this.speedEl.style.color = '#ffffff';

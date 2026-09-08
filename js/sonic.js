@@ -16,10 +16,10 @@ class SonicPlayer {
         this.bankingAngle = 0;
         this.worldGroundHeight = 0;
         
-        // Physics constants - Sonic Momentum Engine Specs (1ThaiAi Master Prompt)
-        this.accel = 42.0;
-        this.maxSpeed = 48.0;
-        this.boostMaxSpeed = 82.0;
+        // Physics constants - Level 1 Balanced Speed Tuning
+        this.accel = 30.0;
+        this.maxSpeed = 34.0;
+        this.boostMaxSpeed = 58.0;
         this.friction = 0.94;
         this.gravity = 42.0;
         this.jumpForce = 28.0;
@@ -54,7 +54,7 @@ class SonicPlayer {
         this.currentLoop = null;
         this.loopAngle = 0;
         this.loopPitch = 0;
-        this.loopSpeed = 46;
+        this.loopSpeed = 36;
         this.loopCooldown = 0;
 
         // Render Mode: 'fbx' (Mixamo Animated Run 3D Model), 'gltf' (Authentic Sonic Dash 3D Model), 'mesh3d' (Articulated 3D Model) or 'sprite' (Retro 2D Sprite)
@@ -766,11 +766,11 @@ class SonicPlayer {
         
         if (isSprinting) {
             // A. Responsive Running Strafe: Glide left/right relative to Sonic's facing angle
-            const targetStrafe = (input.left ? -14.0 : 0) + (input.right ? 14.0 : 0);
-            this.strafeVelLateral += (targetStrafe - this.strafeVelLateral) * Math.min(1.0, 14.0 * dt);
+            const targetStrafe = (input.left ? -15.0 : 0) + (input.right ? 15.0 : 0);
+            this.strafeVelLateral += (targetStrafe - this.strafeVelLateral) * Math.min(1.0, 16.0 * dt);
 
             // B. Responsive High-Speed Steering (Smooth turning without sudden jerk)
-            const highSpeedSteer = 1.45;
+            const highSpeedSteer = 1.65;
             if (input.left) this.rotationY += highSpeedSteer * dt;
             if (input.right) this.rotationY -= highSpeedSteer * dt;
 
@@ -805,7 +805,7 @@ class SonicPlayer {
 
         // Smooth Banking Tilt (tilts into strafe & turns)
         const targetBank = isSprinting
-            ? (this.strafeVelLateral / 14.0) * 0.35
+            ? (this.strafeVelLateral / 15.0) * 0.35
             : ((input.left ? 0.32 : 0) - (input.right ? 0.32 : 0));
         this.bankingAngle += (targetBank - this.bankingAngle) * Math.min(1.0, 12.0 * dt);
         this.characterModel.rotation.z = this.bankingAngle;
@@ -830,7 +830,7 @@ class SonicPlayer {
             // Release spin dash when player releases DOWN key
             if (!input.down) {
                 this.isChargingSpinDash = false;
-                this.forwardSpeed = 36 + this.spinDashCharge * 4; // 36 up to 52 boost!
+                this.forwardSpeed = 26 + this.spinDashCharge * 3; // Balanced burst up to 44
                 this.spinDashCharge = 0;
                 window.soundManager.playSpinRelease();
             }
