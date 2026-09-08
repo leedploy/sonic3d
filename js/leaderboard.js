@@ -109,8 +109,9 @@ class LeaderboardManager {
 
     addScore(name, score, timeSec, rings) {
         // 1. Synchronously add to Local Storage first (Zero delay for game flow)
-        const localScores = this.getLocalScores();
-        const cleanName = (name || 'SONIC').trim().toUpperCase().replace(/[^a-zA-Z0-9 _-]/g, '').substring(0, 10) || 'SONIC';
+        const rawName = (name || 'SONIC').trim();
+        const sanitized = rawName.replace(/[^a-zA-Z0-9\u0E00-\u0E7F _-]/g, '');
+        const cleanName = sanitized.substring(0, 16).trim() || 'SONIC';
         const formattedTime = this.formatTime(timeSec);
         
         const now = new Date();

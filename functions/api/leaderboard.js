@@ -83,8 +83,10 @@ export async function onRequestPost(context) {
 
         const { name, score, timeSec, time, rings } = payload || {};
 
-        // Validation & Sanitization
-        const cleanName = (typeof name === 'string' ? name.trim().replace(/[^a-zA-Z0-9 _-]/g, '') : 'SONIC').toUpperCase().substring(0, 10) || 'SONIC';
+        // Validation & Sanitization: Supports English, Numbers, Thai (\u0E00-\u0E7F), spaces, dashes
+        const rawName = typeof name === 'string' ? name.trim() : 'SONIC';
+        const sanitized = rawName.replace(/[^a-zA-Z0-9\u0E00-\u0E7F _-]/g, '');
+        const cleanName = sanitized.substring(0, 16).trim() || 'SONIC';
         const numScore = Math.min(Math.max(0, parseInt(score, 10) || 0), 9999999);
         const numTimeSec = Math.min(Math.max(1, parseFloat(timeSec) || 60), 7200);
         const numRings = Math.min(Math.max(0, parseInt(rings, 10) || 0), 999);

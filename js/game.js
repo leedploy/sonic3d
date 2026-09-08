@@ -390,11 +390,6 @@ class SonicGame {
                     this.submitPlayerScore();
                 }
             });
-            this.playerNameInput.addEventListener('input', () => {
-                if (this.playerNameInput) {
-                    this.playerNameInput.value = this.playerNameInput.value.toUpperCase();
-                }
-            });
         }
 
         // Next Stage button in Stage Clear
@@ -444,11 +439,6 @@ class SonicGame {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     this.submitGameOverScore();
-                }
-            });
-            gameoverNameInput.addEventListener('input', () => {
-                if (gameoverNameInput) {
-                    gameoverNameInput.value = gameoverNameInput.value.toUpperCase();
                 }
             });
         }
