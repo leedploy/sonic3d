@@ -994,6 +994,7 @@ class SonicGame {
         this.sonic.loopPitch = 0;
         this.cameraYaw = Math.PI;
         this.sonic.rings = 0;
+        this.sonic.totalRingsCollected = 0;
         this.sonic.score = 0;
         this.sonic.boostEnergy = 100;
         this.sonic.isGrounded = true;
@@ -1338,7 +1339,7 @@ class SonicGame {
 
         const totalRunTime = (this.totalRunTime || 0) + this.gameTime;
         const finalScore = this.lastCalculatedScore || (this.sonic ? this.sonic.score : 0);
-        const finalRings = this.sonic ? this.sonic.rings : 0;
+        const finalRings = this.sonic ? (this.sonic.totalRingsCollected || this.sonic.rings) : 0;
         const rankIdx = this.leaderboard.addScore(name, finalScore, totalRunTime, finalRings);
 
         if (this.stageClearScreen) {
@@ -1370,7 +1371,7 @@ class SonicGame {
 
         const totalRunTime = (this.totalRunTime || 0) + this.gameTime;
         const finalScore = this.lastCalculatedScore || (this.sonic ? this.sonic.score : 0);
-        const finalRings = this.sonic ? this.sonic.rings : 0;
+        const finalRings = this.sonic ? (this.sonic.totalRingsCollected || this.sonic.rings) : 0;
         const rankIdx = this.leaderboard.addScore(name, finalScore, totalRunTime, finalRings);
 
         if (this.gameOverModal) {
@@ -1766,12 +1767,15 @@ class SonicGame {
 
         const gameoverFinalTime = document.getElementById('gameover-final-time');
         const gameoverFinalScore = document.getElementById('gameover-final-score');
+        const gameoverFinalRings = document.getElementById('gameover-final-rings');
+        const totalRings = this.sonic ? (this.sonic.totalRingsCollected || 0) : 0;
         const gameoverNameSection = document.getElementById('gameover-name-section');
         const gameoverLeaderboardContainer = document.getElementById('gameover-leaderboard-container');
         const gameoverNameInput = document.getElementById('gameover-name-input');
 
         if (gameoverFinalScore) gameoverFinalScore.textContent = finalScore.toLocaleString();
         if (gameoverFinalTime) gameoverFinalTime.textContent = this.formatTime(finalTime);
+        if (gameoverFinalRings) gameoverFinalRings.textContent = `🟡 ${totalRings.toLocaleString()}`;
 
         if (gameoverNameSection) gameoverNameSection.classList.remove('hidden');
         if (gameoverLeaderboardContainer) gameoverLeaderboardContainer.classList.add('hidden');

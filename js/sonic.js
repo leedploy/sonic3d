@@ -38,6 +38,7 @@ class SonicPlayer {
         this.maxBoostEnergy = 100;
         this.boostDepleted = false;
         this.rings = 0;
+        this.totalRingsCollected = 0;
         this.score = 0;
         this.invulnerableTimer = 0;
         this.isHurt = false;
@@ -1296,6 +1297,7 @@ class SonicPlayer {
 
     addRing(count = 1) {
         this.rings += count;
+        this.totalRingsCollected = (this.totalRingsCollected || 0) + count;
         this.score += count * 100;
         // Ring collection bonus: recharge small amount of boost energy (+1.5 per ring)
         this.boostEnergy = Math.min(this.maxBoostEnergy, this.boostEnergy + count * 1.5);
