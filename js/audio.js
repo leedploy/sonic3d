@@ -5,7 +5,7 @@ class SoundManager {
     constructor() {
         this.ctx = null;
         this.sfxMasterGain = null;
-        this.bgmVolume = 0.60;
+        this.bgmVolume = 1.0;
         this.sfxVolume = 0.80;
         this.isMuted = false;
         this.loadSettings();
@@ -122,7 +122,7 @@ class SoundManager {
 
     loadSettings() {
         try {
-            const saved = localStorage.getItem('sonic_sound_settings');
+            const saved = localStorage.getItem('sonic_sound_settings_v2');
             if (saved) {
                 const data = JSON.parse(saved);
                 if (typeof data.bgmVolume === 'number') this.bgmVolume = data.bgmVolume;
@@ -135,11 +135,12 @@ class SoundManager {
     saveSettings() {
         try {
             const data = {
+                version: 2,
                 bgmVolume: this.bgmVolume,
                 sfxVolume: this.sfxVolume,
                 isMuted: this.isMuted
             };
-            localStorage.setItem('sonic_sound_settings', JSON.stringify(data));
+            localStorage.setItem('sonic_sound_settings_v2', JSON.stringify(data));
         } catch (e) {}
     }
 
@@ -946,7 +947,7 @@ class SoundManager {
                 filter.frequency.setValueAtTime(800, t);
                 filter.frequency.exponentialRampToValueAtTime(180, t + stepSec * 0.7);
 
-                const vol = (this.bgmVolume || 0.6) * 0.22;
+                const vol = (this.bgmVolume ?? 1.0) * 0.22;
                 bGain.gain.setValueAtTime(vol, t);
                 bGain.gain.exponentialRampToValueAtTime(0.001, t + stepSec * 0.85);
 
@@ -970,7 +971,7 @@ class SoundManager {
                 mFilter.type = 'lowpass';
                 mFilter.frequency.setValueAtTime(2200, t);
 
-                const vol = (this.bgmVolume || 0.6) * 0.12;
+                const vol = (this.bgmVolume ?? 1.0) * 0.12;
                 mGain.gain.setValueAtTime(vol, t);
                 mGain.gain.exponentialRampToValueAtTime(0.001, t + stepSec * 0.9);
 
@@ -990,7 +991,7 @@ class SoundManager {
                 aOsc.type = 'sine';
                 aOsc.frequency.setValueAtTime(aFreq, t);
 
-                const vol = (this.bgmVolume || 0.6) * 0.08;
+                const vol = (this.bgmVolume ?? 1.0) * 0.08;
                 aGain.gain.setValueAtTime(vol, t);
                 aGain.gain.exponentialRampToValueAtTime(0.001, t + stepSec * 0.6);
 
