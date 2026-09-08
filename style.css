@@ -1707,8 +1707,12 @@ body, html {
 
 .col-name {
     color: #ffffff;
-    font-weight: bold;
-    font-family: var(--font-arcade), 'Kanit', sans-serif;
+    font-weight: 700;
+    font-family: 'Kanit', var(--font-arcade), sans-serif;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
 }
 
 .col-score {

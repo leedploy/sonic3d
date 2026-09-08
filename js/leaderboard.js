@@ -111,7 +111,7 @@ class LeaderboardManager {
         // 1. Synchronously add to Local Storage first (Zero delay for game flow)
         const rawName = (name || 'SONIC').trim();
         const sanitized = rawName.replace(/[^a-zA-Z0-9\u0E00-\u0E7F _-]/g, '');
-        const cleanName = sanitized.substring(0, 16).trim() || 'SONIC';
+        const cleanName = sanitized.substring(0, 12).trim() || 'SONIC';
         const formattedTime = this.formatTime(timeSec);
         
         const now = new Date();
@@ -128,9 +128,27 @@ class LeaderboardManager {
 
         this.lastSubmittedEntry = newEntry;
 
-        // 1. Update Local Storage
-        const localScores = this.getLocalScores();
-        localScores.push(newEntry);
+        // 1. Update Local Storage with deduplication
+        let localScores = this.getLocalScores();
+        const localDupIdx = localScores.findIndex(s => s.name === newEntry.name && s.score === newEntry.score && Math.abs((s.timeSec || 0) - (newEntry.timeSec || 0)) < 2.0);
+        if (localDupIdx !== -1) {
+            localScores[localDupIdx] = newEntry;
+        } else {
+            localScores.push(newEntry);
+        }
+
+        // Clean any historical duplicates
+        const uniqueLocal = [];
+        const seenLocal = new Set();
+        for (const s of localScores) {
+            const key = `${s.name}_${s.score}`;
+            if (!seenLocal.has(key)) {
+                seenLocal.add(key);
+                uniqueLocal.push(s);
+            }
+        }
+        localScores = uniqueLocal;
+
         localScores.sort((a, b) => {
             if (b.score !== a.score) return b.score - a.score;
             return (a.timeSec || 9999) - (b.timeSec || 9999);
@@ -140,14 +158,29 @@ class LeaderboardManager {
         const trimmedLocal = localScores.slice(0, this.maxEntries);
         this.saveLocalScores(trimmedLocal);
 
-        // 2. Optimistically update in-memory globalScores so it appears immediately in GLOBAL view!
+        // 2. Optimistically update in-memory globalScores with deduplication!
         if (!this.globalScores || !Array.isArray(this.globalScores) || this.globalScores.length === 0) {
             this.globalScores = [...this.defaultScores];
         }
-        const existingGlobalIdx = this.globalScores.findIndex(s => s.name === newEntry.name && s.score === newEntry.score && s.timeSec === newEntry.timeSec);
-        if (existingGlobalIdx === -1) {
+        const existingGlobalIdx = this.globalScores.findIndex(s => s.name === newEntry.name && s.score === newEntry.score && Math.abs((s.timeSec || 0) - (newEntry.timeSec || 0)) < 2.0);
+        if (existingGlobalIdx !== -1) {
+            this.globalScores[existingGlobalIdx] = newEntry;
+        } else {
             this.globalScores.push(newEntry);
         }
+
+        // Clean duplicates from globalScores
+        const uniqueGlobal = [];
+        const seenGlobal = new Set();
+        for (const s of this.globalScores) {
+            const key = `${s.name}_${s.score}`;
+            if (!seenGlobal.has(key)) {
+                seenGlobal.add(key);
+                uniqueGlobal.push(s);
+            }
+        }
+        this.globalScores = uniqueGlobal;
+
         this.globalScores.sort((a, b) => {
             if (b.score !== a.score) return b.score - a.score;
             return (a.timeSec || 9999) - (b.timeSec || 9999);

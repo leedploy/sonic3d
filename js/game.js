@@ -1248,6 +1248,11 @@ class SonicGame {
             }
             if (this.clearBtnGroup) this.clearBtnGroup.classList.remove('hidden');
 
+            if (this.saveScoreBtn) {
+                this.saveScoreBtn.disabled = false;
+                this.saveScoreBtn.textContent = '💾 SUBMIT SCORE';
+            }
+
             if (this.playerNameInput) {
                 this.playerNameInput.value = this.lastPlayerName || 'SONIC';
                 setTimeout(() => {
@@ -1318,6 +1323,15 @@ class SonicGame {
     }
 
     submitPlayerScore() {
+        if (this.isSubmittingScore) return;
+        this.isSubmittingScore = true;
+        setTimeout(() => { this.isSubmittingScore = false; }, 2000);
+
+        if (this.saveScoreBtn) {
+            this.saveScoreBtn.disabled = true;
+            this.saveScoreBtn.textContent = 'SAVING...';
+        }
+
         const rawName = this.playerNameInput ? this.playerNameInput.value.trim() : '';
         const name = rawName || this.lastPlayerName || 'SONIC';
         this.lastPlayerName = name;
@@ -1339,6 +1353,16 @@ class SonicGame {
     }
 
     submitGameOverScore() {
+        if (this.isSubmittingScore) return;
+        this.isSubmittingScore = true;
+        setTimeout(() => { this.isSubmittingScore = false; }, 2000);
+
+        const gameoverSaveBtn = document.getElementById('gameover-save-btn');
+        if (gameoverSaveBtn) {
+            gameoverSaveBtn.disabled = true;
+            gameoverSaveBtn.textContent = 'SAVING...';
+        }
+
         const gameoverNameInput = document.getElementById('gameover-name-input');
         const rawName = gameoverNameInput ? gameoverNameInput.value.trim() : '';
         const name = rawName || this.lastPlayerName || 'SONIC';
@@ -1751,6 +1775,11 @@ class SonicGame {
 
         if (gameoverNameSection) gameoverNameSection.classList.remove('hidden');
         if (gameoverLeaderboardContainer) gameoverLeaderboardContainer.classList.add('hidden');
+        const gameoverSaveBtn = document.getElementById('gameover-save-btn');
+        if (gameoverSaveBtn) {
+            gameoverSaveBtn.disabled = false;
+            gameoverSaveBtn.textContent = '💾 SUBMIT SCORE';
+        }
         if (gameoverNameInput) {
             gameoverNameInput.value = this.lastPlayerName || 'SONIC';
             setTimeout(() => {

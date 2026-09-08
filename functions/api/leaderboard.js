@@ -49,6 +49,18 @@ export async function onRequestGet(context) {
             scores = memoryScores && memoryScores.length > 0 ? memoryScores : [...DEFAULT_SCORES];
         }
 
+        // Clean up duplicates if present in storage
+        const uniqueScores = [];
+        const seenKeys = new Set();
+        for (const s of scores) {
+            const key = `${s.name}_${s.score}`;
+            if (!seenKeys.has(key)) {
+                seenKeys.add(key);
+                uniqueScores.push(s);
+            }
+        }
+        scores = uniqueScores;
+
         return new Response(JSON.stringify({
             success: true,
             storage: storageSource,
@@ -83,10 +95,10 @@ export async function onRequestPost(context) {
 
         const { name, score, timeSec, time, rings } = payload || {};
 
-        // Validation & Sanitization: Supports English, Numbers, Thai (\u0E00-\u0E7F), spaces, dashes
+        // Validation & Sanitization: Supports English, Numbers, Thai (\u0E00-\u0E7F), spaces, dashes (Max 12 chars)
         const rawName = typeof name === 'string' ? name.trim() : 'SONIC';
         const sanitized = rawName.replace(/[^a-zA-Z0-9\u0E00-\u0E7F _-]/g, '');
-        const cleanName = sanitized.substring(0, 16).trim() || 'SONIC';
+        const cleanName = sanitized.substring(0, 12).trim() || 'SONIC';
         const numScore = Math.min(Math.max(0, parseInt(score, 10) || 0), 9999999);
         const numTimeSec = Math.min(Math.max(1, parseFloat(timeSec) || 60), 7200);
         const numRings = Math.min(Math.max(0, parseInt(rings, 10) || 0), 999);
@@ -128,8 +140,27 @@ export async function onRequestPost(context) {
             scores = memoryScores && memoryScores.length > 0 ? [...memoryScores] : [...DEFAULT_SCORES];
         }
 
+        // Deduplicate: replace identical submission instead of duplicating
+        const dupIdx = scores.findIndex(s => s.name === newEntry.name && s.score === newEntry.score && Math.abs((s.timeSec || 0) - (newEntry.timeSec || 0)) < 2.0);
+        if (dupIdx !== -1) {
+            scores[dupIdx] = newEntry;
+        } else {
+            scores.push(newEntry);
+        }
+
+        // Clean up any historical duplicate entries
+        const uniqueScores = [];
+        const seenKeys = new Set();
+        for (const s of scores) {
+            const key = `${s.name}_${s.score}`;
+            if (!seenKeys.has(key)) {
+                seenKeys.add(key);
+                uniqueScores.push(s);
+            }
+        }
+        scores = uniqueScores;
+
         // Add & Sort: Primary Score DESC, Secondary Time ASC
-        scores.push(newEntry);
         scores.sort((a, b) => {
             if (b.score !== a.score) return b.score - a.score;
             return (a.timeSec || 9999) - (b.timeSec || 9999);
